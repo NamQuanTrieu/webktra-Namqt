@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Web làm bài trắc nghiệm - Đào Hải Nam-CNTT K22D</title>
+<style>
+:root{
+  --bg:#0b1220;--panel:#0e1626;--card:#101826;--text:#e5e7eb;--muted:#9aa7b8;--border:#1f2a3b;
+  --accent:#22c55e;--danger:#ef4444;--warn:#f59e0b;--info:#06b6d4;--link:#60a5fa;
+}
+[data-theme="light"]{
+  --bg:#f6f7fb; --panel:#ffffff; --card:#ffffff; --text:#0b1220; --muted:#4b5563; --border:#e5e7eb;
+  --accent:#16a34a; --danger:#dc2626; --warn:#f59e0b; --info:#0284c7; --link:#2563eb;
+}
+*{box-sizing:border-box} html,body{height:100%}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--text)}
+.wrap{max-width:1120px;margin:0 auto;padding:16px}
+header{display:flex;align-items:center;gap:12px;padding:8px 0 14px}
+.logo{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;background:conic-gradient(from 180deg at 50% 50%, var(--accent), var(--info), #a78bfa, var(--accent));font-weight:900;color:#081019}
+h1{font-size:20px;margin:0}
+.card{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.25);overflow:hidden}
+.p{padding:16px}
+.muted{color:var(--muted)}
+a{color:var(--link);text-decoration:none}
+.btn{appearance:none;border:1px solid var(--border);background:#0b1220;color:#fff;padding:10px 14px;border-radius:10px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+.btn.primary{background:var(--accent);color:#081019;border-color:transparent;font-weight:700}
+.btn.warn{background:var(--warn);color:#081019;border-color:transparent;font-weight:700}
+.btn.ghost{background:transparent}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+input[type=text],input[type=password],input[type=number],textarea,select{width:100%;background:#0b1220;border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px 12px}
+[data-theme="light"] input,[data-theme="light"] textarea,[data-theme="light"] select{background:#f8fafc;color:#0b1220}
+textarea{min-height:220px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+hr{border:0;border-top:1px solid var(--border);margin:14px 0}
+.chip{display:inline-flex;align-items:center;padding:4px 8px;background:#0b1220;border:1px solid var(--border);border-radius:999px;font-size:12px}
+.pill{padding:4px 10px;border-radius:999px;background:#0b1220;border:1px solid var(--border)}
+.row{display:grid;grid-template-columns:repeat(5,minmax(160px,1fr));gap:10px}
+.col{min-width:0}
+.q{border:1px solid var(--border);border-radius:14px;padding:14px;margin:12px 0}
+.q h3{margin:0 0 10px;font-size:16px}
+.opt{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:12px;border:1px solid transparent}
+.opt:hover{background:#0b1220}
+.opt-letter{min-width:28px;height:28px;border-radius:999px;border:1px solid var(--border);display:inline-grid;place-items:center;font-weight:700;opacity:.9}
+.hidden{display:none!important}.space{height:8px}
+/* player */
+.player-head{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.progress{height:8px;border-radius:6px;background:#0b1220;border:1px solid var(--border);overflow:hidden}
+.progress>i{display:block;height:100%;background:linear-gradient(90deg,var(--info),#60a5fa);width:0%}
+.navline{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.navline .index{font-variant-numeric:tabular-nums}
+.feedback{padding:10px 12px;border-radius:12px;border:1px solid var(--border);margin-top:10px}
+.feedback.ok{background:rgba(34,197,94,.15)}.feedback.bad{background:rgba(239,68,68,.12)}
+.timer{font-weight:800}
+/* Drag & drop */
+.dd-wrap{display:flex;gap:18px;flex-wrap:wrap}
+.dd-col{flex:1;min-width:260px}
+.bucket{border:1px dashed var(--border);border-radius:14px;padding:10px;min-height:120px}
+.drag{display:inline-block;margin:6px;padding:8px 12px;border:1px solid var(--border);border-radius:999px;background:#0b1220;cursor:grab}
+/* result */
+.score-banner{margin:12px 0;padding:16px 18px;border-radius:14px;background:linear-gradient(90deg,rgba(34,197,94,.15),rgba(6,182,212,.15));border:1px solid var(--border);font-size:20px;font-weight:800}
+.result{padding:12px 14px;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,.02)}
+/* top-right badges */
+.badge{border:1px solid var(--border);background:#0b1220;color:#fff;border-radius:999px;padding:6px 10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">Q</div>
+    <div>
+      <h1>Web làm bài trắc nghiệm - Đào Hải Nam-CNTT K22D</h1>
+      <div class="muted">✨ Admin dán đề từ Word • Member làm bài (Ôn tập / Kiểm tra) • Nhiều dạng câu • Dark/Light mode.</div>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+      <span id="who"></span>
+      <button class="btn" id="theme-toggle" title="Đổi giao diện">🌙</button>
+    </div>
+  </header>
+
+  <!-- LOGIN -->
+  <section id="view-login" class="card">
+    <div class="p">
+      <h3>🔐 Đăng nhập</h3>
+      <label>🧑‍💻 Tên đăng nhập</label>
+      <input id="login-username" type="text" placeholder="Nhập tên tài khoản"/>
+      <div class="space"></div>
+      <label>🔑 Mật khẩu</label>
+      <input id="login-password" type="password" placeholder="Nhập mật khẩu"/>
+      <div class="space"></div>
+      <button class="btn primary" id="btn-login">🚪 Vào hệ thống</button>
+      <div id="login-note" class="muted" style="margin-top:8px"></div>
+    </div>
+  </section>
+
+  <!-- ADMIN -->
+  <section id="view-admin" class="card hidden">
+    <div class="p">
+      <div style="display:flex;gap:12px;align-items:center;justify-content:space-between">
+        <div>
+          <h3>🛠️ Bảng điều khiển Admin</h3>
+          <div class="muted">Dấu <b>*</b> là đáp án đúng. Kéo–thả: 3 dòng Trái/Phải/Ghép. Điền từ: đáp án trong {ngoặc nhọn}.</div>
+        </div>
+        <div>
+          <span class="badge">ADMIN</span>
+          <button class="btn" id="btn-logout-a">↩️ Đăng xuất</button>
+        </div>
+      </div>
+      <hr/>
+
+      <!-- Allowlist -->
+      <div class="q">
+        <h3>🎟️ Cấp quyền Member (Allowlist)</h3>
+        <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="acl-enabled" checked> Chỉ tài khoản trong danh sách dưới mới đăng nhập Member (mật khẩu mặc định: <b>123</b>).</label>
+        <div class="row">
+          <div class="col" style="grid-column:span 3">
+            <label>Thêm nhanh (mỗi dòng 1 tài khoản)</label>
+            <textarea id="acl-bulk" placeholder="k22d001&#10;k22d002&#10;namdh..."></textarea>
+          </div>
+          <div class="col">
+            <button class="btn" id="acl-add">➕ Thêm</button>
+            <div class="space"></div>
+            <button class="btn warn" id="acl-clear">🧹 Xóa toàn bộ</button>
+          </div>
+        </div>
+        <div class="space"></div>
+        <div id="acl-list" class="muted"></div>
+      </div>
+
+      <!-- Form tạo đề -->
+      <div class="row">
+        <div class="col"><label>📄 Tên bài</label><input id="exam-title"/></div>
+        <div class="col"><label>📁 Môn/Thư mục</label><input list="subject-list" id="exam-subject"/><datalist id="subject-list"></datalist></div>
+        <div class="col"><label>🏷️ Mã bài</label><input id="exam-code"/></div>
+        <div class="col"><label>⏱️ Thời gian (phút)</label><input id="exam-min" type="number" min="1" value="45"/></div>
+        <div class="col"><label>📆 Tuần (tùy chọn)</label><input id="exam-week" type="number" min="1"/></div>
+      </div>
+      <div class="q">
+        <div class="row" style="grid-template-columns:repeat(5,minmax(140px,1fr))">
+          <div class="col" style="grid-column:span 3"><label>🏫 Thuộc Trường</label>
+            <label class="opt" style="border:none;padding:0"><input type="checkbox" id="school-ictu"> <span style="margin-left:6px">ICTU</span></label>
+            <label class="opt" style="border:none;padding:0"><input type="checkbox" id="school-tnus"> <span style="margin-left:6px">TNUS</span></label>
+            <label class="opt" style="border:none;padding:0"><input type="checkbox" id="school-tump"> <span style="margin-left:6px">TUMP</span></label>
+            <div class="muted" style="margin-top:4px">Không chọn trường nào = hiển thị ở mọi trường.</div>
+          </div>
+          <div class="col"><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="exam-practice"> 🧠 Đánh dấu là bài Ôn tập</label></div>
+        </div>
+      </div>
+      <label>📥 Dán nội dung từ Word</label>
+      <textarea id="raw-input" placeholder="Ví dụ:
+Câu 1 chọn đáp án
+*A. Đúng
+B. Sai
+C. Sai
+D. Sai
+
+Câu 2 chọn nhiều đáp án
+*A. Đúng 1
+*B. Đúng 2
+C. Sai
+D. Sai
+
+Câu 3 điền từ
+Thủ đô của Việt Nam là {Hà Nội}
+
+Câu 4 kéo thả
+Trái: Apple; Banana
+Phải: Quả táo; Quả chuối
+Ghép: Apple=Quả táo; Banana=Quả chuối"></textarea>
+      <div class="space"></div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <button class="btn primary" id="btn-parse">💾 Phân tích & lưu</button>
+        <button class="btn ghost" id="btn-preview">👀 Xem trước</button>
+        <span class="muted" id="parse-msg"></span>
+      </div>
+      <hr/>
+      <div id="admin-preview"></div>
+
+      <hr/>
+      <h3>📚 Kho mã đề (theo Môn)</h3>
+      <div id="repo"></div>
+
+      <!-- MIX -->
+      <div id="mix-panel" class="q hidden">
+        <h3>🧪 Tạo đề trộn</h3>
+        <div class="muted">Đã chọn: <b id="mix-count">0</b> đề.</div>
+        <div class="row">
+          <div class="col"><label>Tiêu đề</label><input id="mix-title" placeholder="Ôn tập tuần 1+3"/></div>
+          <div class="col"><label>Mã</label><input id="mix-code" placeholder="mix-1-3"/></div>
+          <div class="col"><label>Giới hạn số câu</label><input id="mix-limit" type="number" min="1" value="50"/></div>
+          <div class="col"><label>Thời gian</label><input id="mix-min" type="number" min="1" value="45"/></div>
+          <div class="col"><label>Môn</label><input list="subject-list" id="mix-subject"/></div>
+        </div>
+        <div class="space"></div>
+        <div class="row" style="grid-template-columns:repeat(5,minmax(140px,1fr))">
+          <div class="col" style="grid-column:span 3"><label>Trường</label>
+            <label class="opt" style="border:none;padding:0"><input type="checkbox" id="mix-ictu"> <span style="margin-left:6px">ICTU</span></label>
+            <label class="opt" style="border:none;padding:0"><input type="checkbox" id="mix-tnus"> <span style="margin-left:6px">TNUS</span></label>
+            <label class="opt" style="border:none;padding:0"><input type="checkbox" id="mix-tump"> <span style="margin-left:6px">TUMP</span></label>
+          </div>
+          <div class="col"><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="mix-practice"> Ôn tập</label></div>
+        </div>
+        <div class="space"></div>
+        <button class="btn primary" id="btn-mix-create">✨ Tạo đề trộn</button>
+        <button class="btn ghost" id="btn-mix-clear">🧽 Bỏ chọn</button>
+      </div>
+
+      <hr/>
+      <h3>🗂️ Quản lý Thư mục/Môn</h3>
+      <div class="q">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input id="new-subject" style="max-width:260px" placeholder="Tên môn mới"/>
+          <button class="btn" id="btn-add-subject">➕ Thêm thư mục</button>
+          <span class="muted">Có thể khóa thư mục để Member không thấy đề trong thư mục đó.</span>
+        </div>
+        <div id="subject-manager" style="margin-top:10px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MEMBER -->
+  <section id="view-member" class="card hidden">
+    <div class="p">
+      <div style="display:flex;gap:12px;align-items:center;justify-content:space-between">
+        <div>
+          <h3>📜 Danh sách bài</h3>
+          <div class="muted">Nếu có câu hỏi mới hoặc đáp án sai, liên hệ Zalo/SĐT: <b>0379859082</b>.</div>
+        </div>
+        <div>
+          <span class="badge">MEMBER</span>
+          <button class="btn" id="btn-logout-m">↩️ Đăng xuất</button>
+        </div>
+      </div>
+      <hr/>
+      <div id="exam-list"></div>
+      <div id="exam-play" class="hidden"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ===== Storage & helpers ===== */
+const KEY='quizData';
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const DB={load(){const raw=localStorage.getItem(KEY);return raw?JSON.parse(raw):{users:{},subjects:{},acl:{enabled:true,list:[]}}},save(d){localStorage.setItem(KEY,JSON.stringify(d))}};
+const shuffled=a=>{const x=a.slice();for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]]}return x;}
+const deep=x=>JSON.parse(JSON.stringify(x));
+const norm=s=>(s||'').toString().trim().toLowerCase().replace(/\s+/g,' ');
+const escapeHtml=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const cleanOption=t=>{let x=(t||'').trim();const star=x.startsWith('*')||x.includes(' *');x=x.replace(/\*/g,'').replace(/^([A-Da-d]|\d{1,2})[.)-: ]+\s*/,'').replace(/^[−–-•]+\s*/,'');return{text:x.trim(),star};};
+// đề không gán trường -> hiển thị cho mọi trường
+const visibleForSchool=(ex,school)=>{const arr=Array.isArray(ex.schools)?ex.schools:[];return arr.length===0 || arr.includes(school);};
+function motivational(sc){if(sc>=9)return'🏆🎉 Xuất sắc!';if(sc>=8)return'🌟 Rất tốt! Cố lên nào!';if(sc>=7)return'👍 Ổn rồi, phấn đấu 9–10 nhé!';if(sc>=5)return'🙂 Cần luyện thêm!';return'💪 Đừng bỏ cuộc!';}
+
+/* ===== Theme (Dark/Light) ===== */
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('quiz-theme', theme);
+  const btn = document.getElementById('theme-toggle');
+  if(btn) btn.textContent = theme === 'light' ? '☀️' : '🌙';
+}
+(function initTheme(){
+  const saved = localStorage.getItem('quiz-theme') || 'dark';
+  applyTheme(saved);
+  const btn = document.getElementById('theme-toggle');
+  if(btn){ btn.onclick = ()=> applyTheme(document.documentElement.getAttribute('data-theme')==='light'?'dark':'light'); }
+})();
+
+/* ===== Auth & Route ===== */
+let state={me:null,mix:new Set()};
+function setWho(){ $('#who').innerHTML=state.me?`<span class="chip">${state.me.username}</span> <span class="pill">${state.me.role.toUpperCase()}</span>`:'';}
+function route(){
+  ['#view-login','#view-admin','#view-member'].forEach(s=>$(s).classList.add('hidden'));
+  if(!state.me) $('#view-login').classList.remove('hidden');
+  else if(state.me.role==='admin'){ $('#view-admin').classList.remove('hidden'); renderDatalist(); renderACL(); renderRepo(); }
+  else { $('#view-member').classList.remove('hidden'); renderExamList(); }
+  setWho();
+}
+$('#btn-login').onclick=()=>{
+  const u=$('#login-username').value.trim(), p=$('#login-password').value;
+  if(u==='NamQT'&&p==='070905'){ state.me={username:u,role:'admin'}; route(); return; }
+  const db=DB.load();
+  if(db.acl.enabled && !db.acl.list.map(norm).includes(norm(u))){ $('#login-note').textContent='⛔ Tài khoản chưa được cấp quyền Member.'; return; }
+  if(!db.users[u]){ if(p!=='123'){ $('#login-note').textContent='Sai mật khẩu. Gợi ý: 123'; return; } db.users[u]={username:u,role:'member',password:'123'}; DB.save(db); }
+  if(db.users[u].password===p){ state.me=db.users[u]; route(); } else $('#login-note').textContent='Sai thông tin đăng nhập.';
+};
+$('#btn-logout-a').onclick=()=>{state.me=null; route();};
+$('#btn-logout-m').onclick=()=>{state.me=null; route();};
+
+/* ===== ACL ===== */
+function renderACL(){
+  const db=DB.load(); $('#acl-enabled').checked=!!db.acl.enabled;
+  const list=$('#acl-list'); list.innerHTML='';
+  if(!db.acl.list.length) list.innerHTML='<span class="muted">Chưa có tài khoản nào.</span>';
+  else db.acl.list.sort().forEach(name=>{
+    const chip=document.createElement('span'); chip.className='chip'; chip.style.margin='4px';
+    chip.innerHTML=`${name} <button style="margin-left:6px;background:transparent;border:0;color:#fca5a5;cursor:pointer">✖</button>`;
+    chip.querySelector('button').onclick=()=>{const d=DB.load(); d.acl.list=d.acl.list.filter(x=>x!==name); DB.save(d); renderACL();};
+    list.appendChild(chip);
+  });
+  $('#acl-enabled').onchange=e=>{const d=DB.load(); d.acl.enabled=e.target.checked; DB.save(d);};
+  $('#acl-add').onclick=()=>{const raw=$('#acl-bulk').value.trim(); if(!raw) return; const adds=raw.split(/\r?\n/).map(s=>s.trim()).filter(Boolean); const d=DB.load(); const set=new Set(d.acl.list); adds.forEach(x=>set.add(x)); d.acl.list=[...set]; DB.save(d); $('#acl-bulk').value=''; renderACL();};
+  $('#acl-clear').onclick=()=>{if(!confirm('Xóa toàn bộ danh sách?'))return; const d=DB.load(); d.acl.list=[]; DB.save(d); renderACL();};
+}
+
+/* ===== Parser ===== */
+function parseExam(raw){
+  const blocks=raw.replace(/\r\n/g,'\n').split(/\n{2,}/).map(s=>s.trim()).filter(Boolean); const qs=[];
+  for(const block of blocks){
+    const lines=block.split(/\n/).map(s=>s.trim()).filter(Boolean);
+    const head=(lines.shift()||'').toLowerCase(); if(!head.startsWith('câu')) continue;
+    if(head.includes('kéo thả')){
+      let left=[],right=[],map={};
+      for(const ln of lines){
+        if(/^trái\s*:/i.test(ln)) left=ln.split(':')[1].split(';').map(s=>s.trim()).filter(Boolean);
+        else if(/^phải\s*:/i.test(ln)) right=ln.split(':')[1].split(';').map(s=>s.trim()).filter(Boolean);
+        else if(/^ghép\s*:/i.test(ln)){const pairs=ln.split(':')[1].split(';'); for(const p of pairs){const [L,R]=p.split('='); if(L&&R) map[L.trim()]=R.trim();}}
+      }
+      qs.push({type:'drag',prompt:block.split('\n')[0],left,right,map}); continue;
+    }
+    if(head.includes('điền từ')){
+      const m=block.match(/\{([^}]+)\}/); const ans=m?m[1].trim():'';
+      const prompt=block.replace(/\{[^}]+\}/,'_____');
+      qs.push({type:'fill',prompt:prompt.split('\n')[0],answer:ans}); continue;
+    }
+    const opts=lines.map(cleanOption).filter(o=>o.text); const correctIdx=opts.map((o,i)=>o.star?i:-1).filter(i=>i>=0);
+    qs.push({type:correctIdx.length>1?'multi':'single',prompt:block.split('\n')[0],options:opts.map(o=>o.text),correct:correctIdx.length>1?correctIdx:correctIdx[0]});
+  }
+  return qs;
+}
+
+/* ===== Save / Datalist ===== */
+function saveExamToDB(ex){ const db=DB.load(); const subj=ex.subject||'Chung'; if(!db.subjects[subj]) db.subjects[subj]={locked:false,exams:{}}; db.subjects[subj].exams[ex.code]=ex; DB.save(db); }
+function renderDatalist(){ const db=DB.load(); const dl=$('#subject-list'); dl.innerHTML=Object.keys(db.subjects).sort().map(s=>`<option value="${s}">`).join(''); }
+
+/* ===== Admin: tạo đề ===== */
+$('#btn-preview').onclick=()=>{const raw=$('#raw-input').value.trim(); if(!raw){alert('Chưa có nội dung');return;} renderAdminPreview(parseExam(raw));};
+$('#btn-parse').onclick=()=>{
+  const raw=$('#raw-input').value.trim(), code=$('#exam-code').value.trim(), title=$('#exam-title').value.trim(), subject=($('#exam-subject').value.trim()||'Chung');
+  if(!raw||!code||!title){alert('Điền đủ Tên bài, Mã và Nội dung.');return;}
+  const picked=[]; if($('#school-ictu').checked)picked.push('ICTU'); if($('#school-tnus').checked)picked.push('TNUS'); if($('#school-tump').checked)picked.push('TUMP');
+  const ex={code,title,subject,week:$('#exam-week').value?Number($('#exam-week').value):null,minutes:Number($('#exam-min').value)||45,
+    questions:parseExam(raw),createdAt:Date.now(),schools:picked,practice:$('#exam-practice').checked,published:true};
+  saveExamToDB(ex); $('#parse-msg').textContent=`✅ Lưu ${ex.questions.length} câu cho “${ex.title}” & đã xuất bản.`; renderAdminPreview(ex.questions); renderRepo(); renderDatalist();
+};
+function renderAdminPreview(qs){ const root=$('#admin-preview'); root.innerHTML=''; const frag=document.createDocumentFragment(); qs.forEach((q,i)=>{ const el=document.createElement('div'); el.className='q'; el.innerHTML=`<h3>🧩 Câu ${i+1} – ${labelType(q)}</h3>`+renderQuestion(q,true); frag.appendChild(el);}); root.appendChild(frag);}
+function labelType(q){ if(q.type==='single')return'Chọn 1 đáp án'; if(q.type==='multi')return(q.correct||[]).length>1?`Chọn ${(q.correct||[]).length} đáp án`:'Chọn nhiều đáp án'; return q.type==='drag'?'Kéo thả':'Điền từ'; }
+
+/* ===== Admin: Repo & Mix ===== */
+function updateMixPanel(){ const n=state.mix.size; $('#mix-count').textContent=n; $('#mix-panel').classList.toggle('hidden',n===0); }
+$('#btn-mix-clear').onclick=()=>{state.mix.clear(); renderRepo(); updateMixPanel();}
+$('#btn-mix-create').onclick=()=>{
+  if(state.mix.size===0){alert('Chưa chọn đề để trộn');return;}
+  const db=DB.load(); let pool=[], subject='', union=new Set();
+  state.mix.forEach(code=>{
+    Object.values(db.subjects).forEach(s=>{ if(s.exams[code]){const ex=s.exams[code]; pool=pool.concat(ex.questions); if(!subject) subject=ex.subject; (ex.schools||[]).forEach(x=>union.add(x)); }});
+  });
+  const ex={code:($('#mix-code').value.trim()||('mix-'+Date.now())), title:($('#mix-title').value.trim()||'Đề trộn'),
+    subject:($('#mix-subject').value.trim()||subject||'Chung'), week:null, minutes:Number($('#mix-min').value)||45,
+    questions:shuffled(pool).slice(0,Math.max(1,Number($('#mix-limit').value)||50)), createdAt:Date.now(),
+    schools: (['ICTU','TNUS','TUMP'].filter(s=>$('#mix-'+s.toLowerCase()).checked).length? ['ICTU','TNUS','TUMP'].filter(s=>$('#mix-'+s.toLowerCase()).checked) : [...union]),
+    practice:$('#mix-practice').checked, published:true, mix:true };
+  saveExamToDB(ex); alert(`🎉 Đã tạo “${ex.title}” (${ex.questions.length} câu) & xuất bản.`);
+  state.mix.clear(); renderRepo(); renderDatalist(); updateMixPanel();
+};
+function renderRepo(){
+  const db=DB.load(); const root=$('#repo'); root.innerHTML='';
+  const subs=Object.keys(db.subjects).sort(); if(!subs.length){root.innerHTML='<div class="muted">Chưa có mã đề nào.</div>'; return;}
+  subs.forEach(sub=>{
+    const folder=db.subjects[sub], box=document.createElement('div'); const locked=!!folder.locked;
+    box.className='q'; box.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="font-weight:800">📁 ${sub} ${locked?'<span class="pill">LOCKED</span>':''}</div>
+      <div>
+        <button class="btn" data-act="toggle" data-sub="${sub}">${locked?'🔓 Mở khóa':'🔒 Khóa'}</button>
+        <button class="btn warn" data-act="del-folder" data-sub="${sub}">🗑️ Xóa thư mục</button>
+      </div></div>
+      <div class="repo-g"></div>`;
+    const g=box.querySelector('.repo-g');
+    const exams=Object.values(folder.exams||{}).sort((a,b)=>(a.week||999)-(b.week||999)||a.title.localeCompare(b.title));
+    const frag=document.createDocumentFragment();
+    exams.forEach(ex=>{
+      const checked=state.mix.has(ex.code)?'checked':''; const pub=ex.published;
+      const line=document.createElement('div'); line.style.display='flex'; line.style.gap='10px'; line.style.alignItems='center'; line.style.justifyContent='space-between'; line.style.padding='6px 0';
+      line.innerHTML=`<div style="display:flex;gap:10px;align-items:center">
+        <input type="checkbox" data-pick="${ex.code}" ${checked} title="Chọn để trộn"/>
+        <div><b>${ex.title}</b> <span class="muted">• ${ex.questions.length} câu • ${ex.minutes}p • Mã: ${ex.code}${ex.week?' • Tuần '+ex.week:''}${ex.practice?' • Ôn tập':''}${pub?' • ✅ Xuất bản':' • ⛔ Ẩn'}</span></div>
+      </div>
+      <div>
+        <button class="btn" data-peek="${ex.code}">👁️ Xem</button>
+        <button class="btn" data-edit="${ex.code}">⬆️ Nạp để sửa</button>
+        <button class="btn" data-pub="${ex.code}">${pub?'🙈 Ẩn':'✅ Xuất bản'}</button>
+        <button class="btn warn" data-del="${ex.code}">🗑️ Xóa đề</button>
+      </div>`;
+      frag.appendChild(line);
+    });
+    g.appendChild(frag);
+
+    box.addEventListener('click',e=>{
+      const db2=DB.load();
+      const pick=e.target.closest('input[data-pick]'); if(pick){ const c=pick.getAttribute('data-pick'); if(pick.checked) state.mix.add(c); else state.mix.delete(c); updateMixPanel(); return; }
+      const act=e.target.closest('button'); if(!act) return;
+      if(act.dataset.act==='toggle'){ db2.subjects[sub].locked=!db2.subjects[sub].locked; DB.save(db2); renderRepo(); return; }
+      if(act.dataset.act==='del-folder'){ if(Object.keys(db2.subjects[sub].exams||{}).length){alert('Thư mục chưa rỗng. Hãy xóa đề trước.');return;} delete db2.subjects[sub]; DB.save(db2); renderRepo(); renderDatalist(); return; }
+      const code=act.dataset.peek||act.dataset.edit||act.dataset.del||act.dataset.pub;
+      const ex=db2.subjects[sub].exams[code]; if(!ex) return;
+      if(act.dataset.peek){ const prev=document.createElement('div'); prev.className='q'; prev.innerHTML='<div class="muted">Xem nhanh:</div>'+ex.questions.slice(0,3).map(q=>`<div class="muted">• ${q.type}</div>`).join('')+(ex.questions.length>3?`<div class="muted">… +${ex.questions.length-3} câu</div>`:''); box.appendChild(prev); setTimeout(()=>prev.remove(),2500); }
+      if(act.dataset.edit){ $('#exam-title').value=ex.title; $('#exam-code').value=ex.code; $('#exam-subject').value=sub; $('#exam-min').value=ex.minutes; $('#exam-week').value=ex.week||''; $('#school-ictu').checked=(ex.schools||[]).includes('ICTU'); $('#school-tnus').checked=(ex.schools||[]).includes('TNUS'); $('#school-tump').checked=(ex.schools||[]).includes('TUMP'); $('#exam-practice').checked=!!ex.practice; window.scrollTo({top:0,behavior:'smooth'}); alert('Đã nạp thông tin đề lên form.'); }
+      if(act.dataset.pub){ ex.published=!ex.published; db2.subjects[sub].exams[code]=ex; DB.save(db2); renderRepo(); }
+      if(act.dataset.del){ if(confirm('Xóa đề này?')){ delete db2.subjects[sub].exams[code]; state.mix.delete(code); DB.save(db2); renderRepo(); updateMixPanel(); } }
+    });
+
+    root.appendChild(box);
+  });
+
+  // subject manager
+  const mgr=$('#subject-manager'); mgr.innerHTML='';
+  subs.forEach(sub=>{
+    const locked=!!db.subjects[sub].locked; const row=document.createElement('div');
+    row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center'; row.style.padding='6px 0';
+    row.innerHTML=`<div><b>${sub}</b> ${locked?'<span class="pill">LOCKED</span>':''}</div>
+      <div><button class="btn" data-sm="toggle" data-sub="${sub}">${locked?'🔓 Mở khóa':'🔒 Khóa'}</button>
+      <button class="btn warn" data-sm="del" data-sub="${sub}">🗑️ Xóa</button></div>`;
+    row.addEventListener('click',e=>{
+      const b=e.target.closest('button'); if(!b) return; const d=DB.load();
+      if(b.dataset.sm==='toggle'){ d.subjects[sub].locked=!d.subjects[sub].locked; DB.save(d); renderRepo(); }
+      if(b.dataset.sm==='del'){ if(Object.keys(d.subjects[sub].exams||{}).length){alert('Thư mục chưa rỗng.');return;} delete d.subjects[sub]; DB.save(d); renderRepo(); renderDatalist(); }
+    });
+    mgr.appendChild(row);
+  });
+
+  $('#btn-add-subject').onclick=()=>{ const name=$('#new-subject').value.trim(); if(!name) return; const d=DB.load(); if(!d.subjects[name]) d.subjects[name]={locked:false,exams:{}}; DB.save(d); $('#new-subject').value=''; renderRepo(); renderDatalist(); };
+
+  updateMixPanel();
+}
+
+/* ===== Member: chọn Trường → Môn → Tuần/Ôn tập ===== */
+function renderExamList(){
+  const db=DB.load(); const root=$('#exam-list'); const host=$('#exam-play'); host.classList.add('hidden'); host.innerHTML=''; root.innerHTML='';
+  const schools=['ICTU','TNUS','TUMP']; const grid=document.createElement('div'); grid.style.display='grid'; grid.style.gridTemplateColumns='repeat(3,minmax(160px,1fr))'; grid.style.gap='10px';
+  schools.forEach(sc=>{ const card=document.createElement('div'); card.className='q'; card.style.cursor='pointer'; card.innerHTML=`<div style="font-weight:800;font-size:18px">🏫 ${sc}</div><div class="muted">Nhấn để chọn</div>`; card.onclick=()=>showSubjects(sc); grid.appendChild(card); });
+  root.appendChild(grid);
+
+  function back(cb){ const b=document.createElement('button'); b.className='btn'; b.textContent='← Quay lại'; b.style.marginBottom='10px'; b.onclick=cb; return b; }
+
+  function showSubjects(sc){
+    root.innerHTML=''; root.appendChild(back(()=>renderExamList())); root.insertAdjacentHTML('beforeend', `<h3>${sc} – Chọn Môn</h3>`);
+    const subs=Object.entries(db.subjects)
+      .filter(([name,folder])=>!folder.locked && Object.values(folder.exams||{}).some(ex=>ex.published && visibleForSchool(ex, sc)))
+      .map(([n])=>n).sort();
+    if(!subs.length){root.insertAdjacentHTML('beforeend','<div class="muted">Chưa có môn nào.</div>');return;}
+    const g=document.createElement('div'); g.style.display='grid'; g.style.gridTemplateColumns='repeat(3,minmax(160px,1fr))'; g.style.gap='10px';
+    subs.forEach(s=>{ const c=document.createElement('div'); c.className='q'; c.style.cursor='pointer'; c.innerHTML=`<div style="font-weight:700">📘 ${s}</div>`; c.onclick=()=>showWeeks(sc,s); g.appendChild(c); });
+    root.appendChild(g);
+  }
+
+  function showWeeks(sc,subject){
+    root.innerHTML=''; root.appendChild(back(()=>showSubjects(sc))); root.insertAdjacentHTML('beforeend', `<h3>${sc} / ${subject} – Tuần và Ôn tập</h3>`);
+    const folder=db.subjects[subject]; const list=Object.values(folder.exams||{}).filter(ex=>ex.published && visibleForSchool(ex, sc));
+    const weeks=[...new Set(list.map(ex=>ex.week).filter(Boolean))].sort((a,b)=>a-b);
+    const g=document.createElement('div'); g.style.display='grid'; g.style.gridTemplateColumns='repeat(4,minmax(120px,1fr))'; g.style.gap='10px';
+    weeks.forEach(w=>{ const c=document.createElement('div'); c.className='q'; c.style.cursor='pointer'; c.innerHTML=`<div style="font-weight:700">📅 Tuần ${w}</div>`; c.onclick=()=>showExams(sc,subject,w,false); g.appendChild(c); });
+    if(list.some(ex=>ex.practice)){ const p=document.createElement('div'); p.className='q'; p.style.cursor='pointer'; p.innerHTML=`<div style="font-weight:700">🧠 Ôn tập</div>`; p.onclick=()=>showExams(sc,subject,null,true); g.appendChild(p); }
+    if(g.children.length===0) root.insertAdjacentHTML('beforeend','<div class="muted">Chưa có tuần hoặc bài ôn tập.</div>'); else root.appendChild(g);
+  }
+
+  function showExams(sc,subject,week,practice){
+    root.innerHTML=''; root.appendChild(back(()=>showWeeks(sc,subject))); root.insertAdjacentHTML('beforeend', `<h3>${sc} / ${subject} / ${practice?'Ôn tập':'Tuần '+week}</h3>`);
+    const list=Object.values(db.subjects[subject].exams||{})
+      .filter(ex=>ex.published && visibleForSchool(ex, sc) && (practice?ex.practice:ex.week===week))
+      .sort((a,b)=>b.createdAt-a.createdAt);
+    if(!list.length){root.insertAdjacentHTML('beforeend','<div class="muted">Chưa có đề.</div>');return;}
+    const frag=document.createDocumentFragment();
+    list.forEach(ex=>{
+      const row=document.createElement('div'); row.className='q';
+      row.innerHTML=`<div style="display:flex;gap:12px;align-items:center;justify-content:space-between">
+        <div><div style="font-weight:700">📝 ${ex.title}</div><div class="muted">${ex.questions.length} câu • ${ex.minutes}p • Mã: ${ex.code}${ex.practice?' • Ôn tập':''}</div></div>
+        <div>
+          <label class="pill" style="margin-right:8px;padding:6px 10px;display:inline-flex;gap:6px;align-items:center"><input type="radio" name="mode-${ex.code}" value="practice" checked> Ôn tập</label>
+          <label class="pill" style="margin-right:8px;padding:6px 10px;display:inline-flex;gap:6px;align-items:center"><input type="radio" name="mode-${ex.code}" value="exam"> Kiểm tra</label>
+          <button class="btn primary">🚀 Bắt đầu</button>
+        </div>
+      </div>`;
+      row.querySelector('button').onclick=()=>{const mode=row.querySelector('input[name="mode-'+ex.code+'"]:checked').value; startExam1Q(ex,mode);};
+      frag.appendChild(row);
+    });
+    root.appendChild(frag);
+  }
+}
+
+/* ===== Render Question ===== */
+function renderQuestion(q,preview=false,qi=0){
+  const letter=i=>String.fromCharCode(65+i);
+  if(q.type==='single') return `<div>${escapeHtml(q.prompt)}</div>`+q.options.map((o,i)=>`<label class="opt"><span class="opt-letter">${letter(i)}</span><input ${preview?'disabled':''} data-q="${qi}" data-type="single" type="radio" name="q${qi}" value="${i}" style="margin-left:6px"/><div>${escapeHtml(o)}</div></label>`).join('');
+  if(q.type==='multi') return `<div>${escapeHtml(q.prompt)} <span class="muted">(Chọn ${(q.correct||[]).length})</span></div>`+q.options.map((o,i)=>`<label class="opt"><span class="opt-letter">${letter(i)}</span><input ${preview?'disabled':''} data-q="${qi}" data-type="multi" type="checkbox" value="${i}" style="margin-left:6px"/><div>${escapeHtml(o)}</div></label>`).join('');
+  if(q.type==='fill') return `<div style="margin-bottom:8px">${escapeHtml(q.prompt)}</div><input ${preview?'disabled':''} data-q="${qi}" data-type="fill" type="text" placeholder="Nhập đáp án..."/>`;
+  if(q.type==='drag'){ const L=q.left||[],R=q.right||[]; return `<div class="dd-wrap"><div class="dd-col"><div class="muted" style="margin-bottom:6px">Kéo mảnh</div><div class="bucket" style="min-height:auto">${L.map(x=>`<span draggable="${preview?'false':'true'}" class="drag">${escapeHtml(x)}</span>`).join('')}</div></div><div class="dd-col"><div class="muted" style="margin-bottom:6px">Thả vào đúng ô</div>${R.map(r=>`<div class="bucket" data-q="${qi}" data-right="${escapeHtml(r)}">${escapeHtml(r)}</div>`).join('')}</div></div>`;}
+  return '';
+}
+
+/* ===== Player 1-câu/1-màn (Ôn tập: chỉ chấm khi bấm; nút chấm = chuyển) ===== */
+function startExam1Q(ex,mode){
+  const host=$('#exam-play'), list=$('#exam-list'); list.innerHTML=''; host.classList.remove('hidden'); host.innerHTML='';
+  const work=deep(ex);
+  work.questions=shuffled(work.questions).map(q=>{
+    if(q.type==='single'||q.type==='multi'){
+      const perm=shuffled(q.options.map((_,i)=>i)), opts=perm.map(i=>q.options[i]);
+      if(q.type==='single') return {...q,options:opts,correct:perm.indexOf(q.correct)};
+      return {...q,options:opts,correct:q.correct.map(c=>perm.indexOf(c)).sort((a,b)=>a-b)};
+    } return q;
+  });
+
+  let idx=0, remain=(ex.minutes||45)*60, intv=null;
+  const answers={}, answered=new Set();
+
+  host.innerHTML=`<div class="q">
+    <div class="player-head"><div><b>📝 ${ex.title}</b> <span class="muted">• ${work.questions.length} câu • ${ex.minutes} phút • Chế độ: ${mode==='practice'?'Ôn tập':'Kiểm tra'}</span></div><div class="timer" id="timer">${mode==='exam'?'--:--':'⏸️'}</div></div>
+    <div class="progress" style="margin:10px 0 4px"><i id="bar"></i></div>
+    <div class="navline"><div class="index" id="idx">Câu 1/${work.questions.length}</div><div id="step-msg" class="muted"></div></div>
+  </div>
+  <div id="slot" class="q"></div>
+  <div class="q" style="display:flex;gap:8px;align-items:center;justify-content:space-between">
+    <div>
+      <button class="btn" id="btn-prev">⬅️ Trước</button>
+      <button class="btn" id="btn-next"${mode==='practice'?' disabled':''}>➡️ Sau</button>
+    </div>
+    <div>
+      <button class="btn" id="btn-exit">⏹️ Thoát</button>
+      ${mode==='exam'?'<button class="btn primary" id="btn-submit">📤 Nộp bài</button>':'<button class="btn primary" id="btn-check-next">✅ Kiểm tra / Tiếp theo</button>'}
+    </div>
+  </div>
+  <div id="feedback" class="hidden"></div>
+  <div id="review"></div>`;
+
+  const slot=$('#slot'), idxEl=$('#idx'), bar=$('#bar'), fb=$('#feedback'), review=$('#review'), step=$('#step-msg');
+  const btnPrev=$('#btn-prev'), btnNext=$('#btn-next'), btnCheckNext=$('#btn-check-next');
+
+  function setProgress(){ bar.style.width=((idx)/work.questions.length*100)+'%'; idxEl.textContent=`Câu ${idx+1}/${work.questions.length}`; }
+  function isCorrect(q,ans){
+    if(q.type==='single') return ans===q.correct;
+    if(q.type==='multi'){ const a=Array.isArray(ans)?ans:[]; return JSON.stringify(a)===JSON.stringify((q.correct||[]).slice().sort((x,y)=>x-y)); }
+    if(q.type==='fill'){ return norm(ans)===norm(q.answer||''); }
+    if(q.type==='drag'){ const need=Object.keys(q.map||{}).length; let ok=0; (Array.isArray(ans)?ans:[]).forEach(([L,R])=>{ if((q.map||{})[L]===R) ok++; }); return ok===need&&need>0; }
+    return false;
+  }
+
+  function draw(){
+    const q=work.questions[idx];
+    slot.innerHTML=`<h3>🧩 ${labelType(q)}</h3>`+renderQuestion(q,false,idx);
+    fb.className='hidden'; fb.innerHTML='';
+    step.textContent= mode==='practice' ? 'Chọn đáp án, sau đó bấm “Kiểm tra / Tiếp theo”.' : 'Làm hết rồi bấm Nộp bài.';
+    capture();
+  }
+
+  function capture(){
+    slot.querySelectorAll('[data-q]').forEach(el=>{
+      el.onchange=(e)=>{
+        const i=+e.target.getAttribute('data-q');
+        const t=e.target.getAttribute('data-type');
+        if(t==='single'){ answers[i]=+e.target.value; answered.add(i); }
+        else if(t==='multi'){ const set=new Set(answers[i]||[]); if(e.target.checked) set.add(+e.target.value); else set.delete(+e.target.value); answers[i]=[...set].sort((a,b)=>a-b); if((answers[i]||[]).length>0) answered.add(i); else answered.delete(i); }
+        else if(t==='fill'){ answers[i]=e.target.value.trim(); if(answers[i]) answered.add(i); else answered.delete(i); }
+      }
+    });
+    slot.addEventListener('dragstart',e=>{ if(e.target.classList.contains('drag')) e.dataTransfer.setData('text/plain',e.target.textContent); });
+    slot.addEventListener('dragover',e=>{ if(e.target.classList.contains('bucket')) e.preventDefault(); });
+    slot.addEventListener('drop',e=>{
+      if(e.target.classList.contains('bucket')){
+        e.preventDefault();
+        const text=e.dataTransfer.getData('text/plain');
+        const qi=+e.target.getAttribute('data-q'); const right=e.target.getAttribute('data-right');
+        const chip=document.createElement('span'); chip.className='drag'; chip.textContent=text; e.target.appendChild(chip);
+        const pair=answers[qi]||[]; pair.push([text,right]); answers[qi]=pair; if((answers[qi]||[]).length>0) answered.add(qi);
+      }
+    });
+  }
+
+  function next(){ if(idx<work.questions.length-1){ idx++; setProgress(); draw(); } }
+  function prev(){ if(idx>0){ idx--; setProgress(); draw(); } }
+
+  btnPrev.onclick=prev;
+  if(btnNext) btnNext.onclick=next;
+  $('#btn-exit').onclick=()=>{clearInterval(intv); renderExamList();};
+
+  // Practice: “Kiểm tra / Tiếp theo”
+  if(btnCheckNext){
+    btnCheckNext.onclick=()=>{
+      const q=work.questions[idx];
+      const ans=answers[idx];
+      if(!answered.has(idx)){ fb.className='feedback bad'; fb.innerHTML='⚠️ Bạn chưa chọn đáp án!'; return; }
+      const ok=isCorrect(q,ans);
+      fb.className='feedback '+(ok?'ok':'bad');
+      if(q.type==='single'||q.type==='multi'){
+        const L=k=>String.fromCharCode(65+k);
+        const your=(q.type==='single'?(ans!=null?L(ans):'—'):(ans||[]).map(L).join(', ')||'—');
+        const corr=(q.type==='single'?L(q.correct):q.correct.map(L).join(', '));
+        fb.innerHTML=`${ok?'✅ Đúng':'❌ Sai'} • Bạn: <b>${your}</b> • Đúng: <b>${corr}</b>`;
+      }else if(q.type==='fill'){
+        fb.innerHTML=`${ok?'✅ Đúng':'❌ Sai'} • Đúng: <b>${escapeHtml(q.answer)}</b>`;
+      }else{
+        fb.innerHTML=`${ok?'✅ Đúng':'❌ Sai'} • Ghép đủ các cặp.`;
+      }
+      setTimeout(()=>{
+        if(idx===work.questions.length-1){
+          // tổng kết điểm cho chế độ ôn tập
+          let okCount=0; work.questions.forEach((qq,i)=>{ if(isCorrect(qq,answers[i])) okCount++; });
+          const sc=Math.round((okCount/work.questions.length)*100)/10;
+          const banner=document.createElement('div'); banner.className='score-banner';
+          banner.innerHTML=`Điểm: ${sc} / 10 <span style="margin-left:10px">${motivational(sc)}</span>`;
+          review.prepend(banner);
+          btnCheckNext.disabled=true; btnPrev.disabled=true;
+          window.scrollTo({top:0,behavior:'smooth'});
+        }else{ next(); }
+      },900);
+    };
+  }
+
+  // Exam mode: đồng hồ + nộp cuối
+  if(mode==='exam'){
+    const timer=$('#timer');
+    function tick(){ const m=Math.floor(remain/60).toString().padStart(2,'0'); const s=(remain%60).toString().padStart(2,'0'); timer.textContent=`${m}:${s}`; if(remain<=0){clearInterval(intv); grade();} remain--; }
+    tick(); intv=setInterval(tick,1000);
+    $('#btn-submit').onclick=grade;
+  }
+
+  function grade(){
+    let ok=0; work.questions.forEach((q,i)=>{ if(isCorrect(q,answers[i])) ok++; });
+    const sc=Math.round((ok/work.questions.length)*100)/10;
+    const banner=document.createElement('div'); banner.className='score-banner'; banner.innerHTML=`Điểm: ${sc} / 10 <span style="margin-left:10px">${motivational(sc)}</span>`;
+    review.prepend(banner);
+    review.innerHTML += work.questions.map((q,i)=>{const ans=answers[i];const good=isCorrect(q,ans); const L=k=>String.fromCharCode(65+k); let detail=''; if(q.type==='single'||q.type==='multi'){const your=(q.type==='single'?(ans!=null?L(ans):'—'):(ans||[]).map(L).join(', ')||'—'); const corr=(q.type==='single'?L(q.correct):q.correct.map(L).join(', ')); detail=`Bạn: ${your} • Đúng: ${corr}`;} else if(q.type==='fill'){detail=`Bạn: <code>${ans||'—'}</code> • Đúng: <code>${escapeHtml(q.answer)}</code>`;} else detail=`Ghép ${(Array.isArray(ans)?ans.length:0)}/${Object.keys(q.map||{}).length}`; return `<div class="q"><b>${i+1}. ${escapeHtml(q.prompt||'')}</b><div class="result">${good?'✅ Đúng':'❌ Sai'} • ${detail}</div></div>`;}).join('');
+    const bSubmit=$('#btn-submit'); if(bSubmit) bSubmit.disabled=true; btnPrev.disabled=true; if(btnNext) btnNext.disabled=true;
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  setProgress(); draw();
+}
+
+/* ===== INIT ===== */
+(function init(){ route(); })();
+</script>
+</body>
+</html>
